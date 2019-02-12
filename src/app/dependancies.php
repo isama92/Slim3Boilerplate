@@ -67,9 +67,4 @@ $container['view'] = function ($container) {
 };
 
 
-
-
-
-
-
 $app->add(new \Slim\Middleware\Session($settings['session']));

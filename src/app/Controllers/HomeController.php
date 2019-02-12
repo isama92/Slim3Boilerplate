@@ -10,7 +10,6 @@
 
 namespace App\Controllers;
 
-use App\Helpers\Mailer;
 use Slim\Http\Request;
 use Slim\Http\Response;
 

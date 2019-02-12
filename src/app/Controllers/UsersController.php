@@ -37,7 +37,7 @@ class UsersController extends Controller
         if($request->getParam('ordt'))
             $orderType = $request->getParam('ordt');
 
-        $users = User::where($where)->orderBy($orderBy, $orderType)->paginate(12)->appends($request->getParams());
+        $users = User::withTrashed()->where($where)->orderBy($orderBy, $orderType)->paginate(12)->appends($request->getParams());
 
         return $this->view->render($response, 'admin/users/list.twig', [
             'users' => $users,
@@ -83,7 +83,6 @@ class UsersController extends Controller
 
     public function form(Request $request, Response $response, $args)
     {
-
         $user = null;
         if(isset($args['id'])) {
             $user = User::find($args['id']);

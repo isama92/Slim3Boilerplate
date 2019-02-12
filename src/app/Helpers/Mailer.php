@@ -30,14 +30,6 @@ class Mailer
 
         try {
             $mailer = new PHPMailer(true);
-//            $mailer->SMTPDebug = $mail_settings['SMTPDebug'];
-//            $mailer->isSMTP();
-//            $mailer->Host = $mail_settings['Host'];
-//            $mailer->SMTPAuth = $mail_settings['SMTPAuth'];
-//            $mailer->Username = $mail_settings['Username'];
-//            $mailer->Password = $mail_settings['Password'];
-//            $mailer->SMTPSecure = $mail_settings['SMTPSecure'];
-//            $mailer->Port = $mail_settings['Port'];
             $mailer->setFrom($mail_settings['from']['address'], $mail_settings['from']['name']);
         } catch (Exception $e) {
             $this->error = 'Mailer Error: ' . $this->mailer->ErrorInfo;

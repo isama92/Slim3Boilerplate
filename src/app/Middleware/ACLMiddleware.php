@@ -10,11 +10,10 @@
 
 namespace App\Middleware;
 
+use App\Helpers\Utility;
+use App\Models\Role;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use App\Helpers\Utility;
-use App\Models\User;
-use App\Models\Role;
 
 
 class ACLMiddleware extends Middleware
