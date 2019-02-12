@@ -1,0 +1,13 @@
+{
+  "name": "slim3_boilerplate",
+  "version": "1.0.0",
+  "description": "A simple slim 3 boilerplate",
+  "private": true,
+  "author": "Stefano Borzoni",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^4.2.1",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1"
+  }
+}

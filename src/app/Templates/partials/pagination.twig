@@ -1,0 +1,28 @@
+{% if paginator.hasPages %}
+    <div class="d-flex justify-content-center">
+        <ul class="pagination">
+
+            {% if paginator.onFirstPage %}
+                <li class="page-item disabled"><span class="page-link"><i class="fa fa-angle-double-left"></i></span></li>
+            {% else %}
+                <li class="page-item"><a href="{{ paginator.previousPageUrl | replace({ '?': '/?' }) }}" class="page-link"><i class="fa fa-angle-left"></i></a></li>
+            {% endif %}
+
+            {% for element in elements %}
+                {% if element is iterable %}
+                    {% for page, url in element %}
+                        <li class="page-item {{ page == paginator.currentPage? 'active' : '' }}"><a href="{{ url | replace({ '?': '/?' }) }}" class="page-link">{{ page }}</a></li>
+                    {% endfor %}
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">{{ element }}</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if paginator.hasMorePages %}
+                <li class="page-item"><a href="{{ paginator.nextPageUrl | replace({ '?': '/?' }) }}" class="page-link"><i class="fa fa-angle-right"></i></a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link"><i class="fa fa-angle-double-right"></i></span></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}

@@ -1,0 +1,17 @@
+# ide
+.idea/
+
+# docker files
+data/
+
+# libs
+src/vendor/
+**node_modules/
+
+# platform specific
+src/.env
+src/.htaccess
+src/public/.htaccess
+
+# generated /dist
+dist/

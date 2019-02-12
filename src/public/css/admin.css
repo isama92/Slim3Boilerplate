@@ -1,0 +1,32 @@
+#admin {
+    padding-bottom: 60px;
+}
+
+.cpointer {
+    cursor: pointer;
+}
+
+#admin .navbar .logo {
+    height: 40px;
+    width: auto;
+}
+
+#admin .table td {
+    vertical-align: middle;
+}
+
+#admin table td.actions .action:not(:first-child) {
+    margin-left: 7px;
+}
+
+.tooltip-inner {
+    white-space:pre;
+    max-width:none;
+}
+
+footer .content {
+    height: 40px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}

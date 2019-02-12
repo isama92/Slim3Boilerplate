@@ -1,0 +1,20 @@
+<div class="collapse navbar-collapse" id="navbar">
+    {% if auth.check  %}
+        <ul class="navbar-nav m-auto">
+            <li class="nav-item"><a class="nav-link{% if current_path() == path_for('admin') %} active{% endif %}" href="{{ path_for('admin') }}">Home</a></li>
+            {% if auth.user.role.level >= 100 %}
+                <li class="nav-item"><a class="nav-link{% if current_path() == path_for('users') %} active{% endif %}" href="{{ path_for('users') }}">Users</a></li>
+            {% endif %}
+        </ul>
+        <div class="dropdown">
+            <button class="btn btn-outline-danger dropdown-toggle" type="button"id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{ auth.user.full_name }}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="{{ path_for('change_password') }}">Change Password</a>
+                <a class="dropdown-item" href="{{ path_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    {% endif %}
+</div>

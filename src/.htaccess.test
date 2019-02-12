@@ -1,0 +1,5 @@
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^slim3boilerplate.local$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^www.slim3boilerplate.local$
+RewriteCond %{REQUEST_URI} !public/
+RewriteRule (.*) /public/$1 [L]
