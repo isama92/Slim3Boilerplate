@@ -25,7 +25,10 @@ $container['session'] = function() { return new \SlimSession\Helper; };
 $container['csrf'] = function($container) {
     $guard = new \Slim\Csrf\Guard;
     $guard->setFailureCallable(function(\Slim\Http\Request $request, \Slim\Http\Response $response, $next) use ($container) {
-        return $response->withRedirect($container->router->pathFor('admin'));
+        return $container->view->render($response, 'error.twig', [
+            'code' => 500,
+            'msg' => 'You cannot reload the page',
+        ]);
     });
     return $guard;
 };
@@ -66,5 +69,5 @@ $container['view'] = function ($container) {
     return $view;
 };
 
-
+$app->add(new \App\Middleware\ACLMiddleware($container));
 $app->add(new \Slim\Middleware\Session($settings['session']));

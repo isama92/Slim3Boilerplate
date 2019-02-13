@@ -19,6 +19,4 @@ $app->group('/admin', function () {
     $this->get('/logout', 'AuthController:logout')->setName('logout');
     $this->get('/change_password', 'AuthController:changePasswordForm')->setName('change_password');
     $this->post('/change_password', 'AuthController:changePassword')->setName('change_password_save');
-})
-    ->add(new \Slim\Middleware\Session($container->get('settings')['session']))
-    ->add(new ACLMiddleware($container));
+});

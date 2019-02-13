@@ -41,6 +41,16 @@ class ACLMiddleware extends Middleware
         // 'role' => '*', // access to all
         $accessList = [
             [
+                'role' => '*',
+                'path' => '/',
+                'method' => ['GET'],
+            ],
+            [
+                'role' => '*',
+                'path' => '[]',
+                'method' => ['GET'],
+            ],
+            [
                 'role' => [$this->roles['user'], $this->roles['admin']],
                 'path' => '/admin[/]',
                 'method' => ['GET'],
