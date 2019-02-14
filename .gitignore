@@ -13,5 +13,5 @@ src/.env
 src/.htaccess
 src/public/.htaccess
 
-# generated /dist
-dist/
+# tmp files
+src/cache

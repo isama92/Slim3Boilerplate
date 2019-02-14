@@ -10,6 +10,8 @@
 
 namespace App\Models;
 
+// TODO: SWAP CRYPTER WITH SERVICE; USE  AUTOWRITING https://codecourse.com/watch/using-league-container-with-slim?part=autowiring
+// TODO: EXPORT ALL THE HELPERS
 use App\Helpers\Crypter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

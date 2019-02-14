@@ -11,23 +11,13 @@
 namespace App\Controllers;
 
 
-class Controller
+
+abstract class Controller
 {
     protected $container;
 
-    /**
-     * Constructor
-     *
-     * @param \Slim\Container $container App $container
-     */
-    public function __construct($container)
+    public function setContainer(\League\Container\Container $container)
     {
         $this->container = $container;
-    }
-
-    public function __get($property)
-    {
-        if($this->container->{$property})
-            return $this->container->{$property};
     }
 }

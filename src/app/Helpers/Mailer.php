@@ -22,11 +22,11 @@ class Mailer
     protected $test_email;
     protected $error;
 
-    public function __construct()
+    public function __construct($settings)
     {
-        $this->error = '';
-        $settings = App::getContainer()->settings;
         $mail_settings = $settings['mailer'];
+
+        $this->error = '';
 
         try {
             $mailer = new PHPMailer(true);

@@ -10,24 +10,28 @@
 
 namespace App\View;
 
-use SlimFacades\App;
-
+use \Slim\Views\Twig;
 
 class Factory
 {
     protected $view;
+    protected $settings;
 
-    public static function getEngine()
+    public function __construct($settings)
     {
-        $settings = App::getContainer()['settings'];
-        return new \Slim\Views\Twig($settings['template_path'], [
-            'cache' => !$settings['test_mode']? $settings['tmp_path'] .DIRECTORY_SEPARATOR . 'twig' : false,
+        $this->settings = $settings;
+    }
+
+    public static function getEngine($settings)
+    {
+        return new Twig($settings->get('view.template_path'), [
+            'cache' => $settings->get('view.cache'),
         ]);
     }
 
     public function make($view, $data = [])
     {
-        $this->view = static::getEngine()->fetch($view, $data);
+        $this->view = static::getEngine($this->settings)->fetch($view, $data);
         return $this;
     }
 

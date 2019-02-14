@@ -18,11 +18,11 @@ class HomeController extends Controller
 {
     public function index(Request $request, Response $response)
     {
-        return $this->view->render($response, 'index.twig');
+        return $this->container->get('view')->render($response, 'index.twig');
     }
 
-    public function error404(Request $request, Response $response)
+    public function error(Request $request, Response $response)
     {
-        return $this->errorH->render($response, 404, 'Page not found');
+        return $this->container->get('customErrorHandler')->render($response, 404, 'Page not found');
     }
 }

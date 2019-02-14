@@ -8,6 +8,9 @@
 |
 */
 
+use App\Controllers\HomeController;
+
 require __DIR__ . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'index.php';
-$app->get('/', 'HomeController:index')->setName('home');
-$app->get('[{path:.*}]', 'HomeController:error404')->setName('error404');
+
+$app->get('/', HomeController::class . ':index')->setName('home');
+$app->get('[{path:.*}]', HomeController::class . ':error')->setName('error404');

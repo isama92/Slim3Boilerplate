@@ -16,11 +16,13 @@ use App\Models\IpCache;
 
 class Logger
 {
-    private $container;
+    private $settings;
+    private $auth;
 
-    public function __construct($container)
+    public function __construct($settings, $auth)
     {
-        $this->container = $container;
+        $this->settings = $settings;
+        $this->auth = $auth;
     }
 
     public function log($event, $details = null)
@@ -48,8 +50,8 @@ class Logger
             'os' => $browserInfo->platform,
         ]);
 
-        if($this->container->auth->check()) {
-            $user = $this->container->auth->user();
+        if($this->auth->check()) {
+            $user = $this->auth->user();
             $log->user()->associate($user);
         }
 
@@ -141,7 +143,7 @@ class Logger
 
     private function getGeoIpInfo($ip)
     {
-        $api_key = $this->container->settings['ipstack']['API_KEY'];
+        $api_key = $this->settings->get('ipstack.API_KEY');
         $data = false;
 
         if($ip) {

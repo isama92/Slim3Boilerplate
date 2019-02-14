@@ -1,7 +1,7 @@
 <?php
 /*
 |--------------------------------------------------------------------------
-| Create The Application
+| Bootstrap
 |--------------------------------------------------------------------------
 |
 | Bootstrap the application
@@ -14,17 +14,15 @@ $dotenv = \Dotenv\Dotenv::create(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTOR
 $dotenv->load();
 
 $settings = require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'settings.php';
-$app = new \Slim\App($settings);
 
-$settings = $settings['settings'];
+$app = new Jenssegers\Lean\App();
 
-// set locale
+$container = $app->getContainer();
+$container->inflector(App\Controllers\Controller::class)->invokeMethod('setContainer', [$container]);
+$container->get('settings')->replace($settings);
+
 setLocale(LC_ALL, $settings['locale']);
 
-\SlimFacades\Facade::setFacadeApplication($app);
+require __DIR__ . '/../app/dependencies.php';
 
-// Set up dependencies
-require __DIR__ . '/../app/dependancies.php';
-
-// Routes
 require __DIR__ . '/../app/Routes/index.php';

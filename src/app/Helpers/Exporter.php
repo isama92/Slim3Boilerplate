@@ -10,16 +10,22 @@
 
 namespace App\Helpers;
 
-use SlimFacades\App;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
 class Exporter
 {
-    public static function xlsx($filename, $data)
+    protected $save_path;
+
+    public function __construct($settings)
     {
-        $file = App::getContainer()->settings['tmp_path'] . DIRECTORY_SEPARATOR . $filename . '.xlsx';
+        $this->save_path = $settings->get('tmp_path');
+    }
+
+    public function xlsx($filename, $data)
+    {
+        $file = $this->save_path . DIRECTORY_SEPARATOR . $filename . '.xlsx';
         $ss = new Spreadsheet();
         $ss->getActiveSheet()->fromArray($data);
         $writer = new Xlsx($ss);
@@ -27,9 +33,9 @@ class Exporter
         return $file;
     }
 
-    public static function csv($filename, $data)
+    public function csv($filename, $data)
     {
-        $file = App::getContainer()->settings['tmp_path'] . DIRECTORY_SEPARATOR . $filename . '.csv';
+        $file = $this->save_path . DIRECTORY_SEPARATOR . $filename . '.csv';
         $ss = new Spreadsheet();
         $ss->getActiveSheet()->fromArray($data);
         $writer = new Csv($ss);

@@ -23,7 +23,8 @@
         "illuminate/database": "^5.7",
         "slim/csrf": "^0.8.3",
         "illuminate/pagination": "^5.7",
-        "symfony/var-dumper": "^4.2"
+        "symfony/var-dumper": "^4.2",
+        "jenssegers/lean": "^1.0"
     },
     "autoload": {
         "psr-4": {

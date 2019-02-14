@@ -10,10 +10,10 @@
 
 namespace App\Middleware;
 
-use App\Helpers\Utility;
-use App\Models\Role;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use App\Helpers\Utility;
+use App\Models\Role;
 
 
 class ACLMiddleware extends Middleware
@@ -25,8 +25,8 @@ class ACLMiddleware extends Middleware
     public function __construct($container)
     {
         parent::__construct($container);
-        $this->router = $container->router;
-        $this->auth = $container->auth;
+        $this->router = $container->get('router');
+        $this->auth = $container->get('auth');
         $this->roles = [];
 
         $roles = Role::all();

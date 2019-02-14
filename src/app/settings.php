@@ -8,56 +8,61 @@
 |
 */
 
-$test_mode = intval(getenv('TEST'));
+$debug_mode = strtolower(strval(getenv('DEBUG'))) === 'true';
 
 return [
-    'settings' => [
-        'locale' => 'en_GB.UTF8',
-        'test_mode' => $test_mode,
-        'tmp_path' => __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR. 'cache',
+    'addContentLengthHeader' => false, // Allow the web server to send the content-length header
+    'determineRouteBeforeAppMiddleware' => true, // Used to read the current route objects in your middleware (auth)
+    'displayErrorDetails' => $debug_mode,
+
+    'locale' => 'en_GB.UTF8',
+    'debug_mode' => $debug_mode,
+    'tmp_path' => __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR. 'cache',
+
+
+
+    'view' => [
         'template_path' => __DIR__ . DIRECTORY_SEPARATOR . 'Templates',
-        'displayErrorDetails' => boolval($test_mode),
-        'addContentLengthHeader' => false, // Allow the web server to send the content-length header
-        'determineRouteBeforeAppMiddleware' => true, // Used to read the current route objects in your middleware (auth)
+        'cache' => $debug_mode? false : __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR. 'cache' . DIRECTORY_SEPARATOR . 'twig',
+    ],
 
-        // Services
-        'ipstack' => [
-            'API_KEY' => getenv('IP_STACK'),
-        ],
-        // Mailer
-        'mailer' => [
-            'template_path' => __DIR__ . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR . 'email',
-            'test_email' => 'isama92@gmail.com',
-            'from' => [
-                'address' => 'isama92@gmail.com',
-                'name' => 'Slim 3 Boilerplate',
-            ],
-        ],
+    // Services
+    'ipstack' => [
+        'API_KEY' => getenv('IP_STACK'),
+    ],
 
-        // Session
-        'session' => [
-            'name' => 'auth',
-            'autorefresh' => true,
-            'lifetime' => '1 hour',
+    'mailer' => [
+        'template_path' => __DIR__ . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR . 'email',
+        'test_email' => 'isama92@gmail.com',
+        'from' => [
+            'address' => 'isama92@gmail.com',
+            'name' => 'Slim 3 Boilerplate',
         ],
+    ],
 
-        // Eloquent
-        'db' => [
-            'driver' => 'mysql',
-            'host' => getenv('DB_HOST'),
-            'username' => getenv('DB_USER'),
-            'password' => getenv('DB_PASS'),
-            'database' => getenv('DB_DATABASE'),
-            'charset' => getenv('DB_CHARSET'),
-            'collation' => getenv('DB_COLLATION'),
-            'prefix' => getenv('DB_PREFIX'),
-        ],
+    // Session
+    'session' => [
+        'name' => 'auth',
+        'autorefresh' => true,
+        'lifetime' => '1 hour',
+    ],
 
-        // Crypter
-        'crypter' => [
-            'key' => getenv('CRYPTER_KEY'),
-            'cipher' => 'AES-128-CBC',
-            'hash_alg' => 'sha256',
-        ],
+    // Eloquent
+    'db' => [
+        'driver' => 'mysql',
+        'host' => getenv('DB_HOST'),
+        'username' => getenv('DB_USER'),
+        'password' => getenv('DB_PASS'),
+        'database' => getenv('DB_DATABASE'),
+        'charset' => getenv('DB_CHARSET'),
+        'collation' => getenv('DB_COLLATION'),
+        'prefix' => getenv('DB_PREFIX'),
+    ],
+
+    // Crypter
+    'crypter' => [
+        'key' => getenv('CRYPTER_KEY'),
+        'cipher' => 'AES-128-CBC',
+        'hash_alg' => 'sha256',
     ],
 ];

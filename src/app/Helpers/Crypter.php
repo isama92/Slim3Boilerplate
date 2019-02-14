@@ -10,18 +10,22 @@
 
 namespace App\Helpers;
 
-use SlimFacades\App;
-
 
 class Crypter
 {
+    private $settings;
+
+    public function __construct($settings)
+    {
+        $this->settings = $settings;
+    }
     /**
      * Hash the given password
      *
      * @param string $psw Password to hash
      * @return string Hashed password
      */
-    public static function hashPassword($psw)
+    public function hashPassword($psw)
     {
         if($psw !== '' && password_needs_rehash($psw, PASSWORD_DEFAULT))
             $psw = password_hash($psw, PASSWORD_DEFAULT);
@@ -31,15 +35,14 @@ class Crypter
     /**
      * Encrypt the given string
      *
-     * @param string $str String to encrypt
+     * @param string $plaintext String to encrypt
      * @return string Crypted string
      */
-    public static function encrypt($plaintext)
+    public function encrypt($plaintext)
     {
-        $settings = App::getContainer()['settings'];
-        $cipher = $settings['crypter']['cipher'];
-        $key = $settings['crypter']['key'];
-        $hash_alg = $settings['crypter']['hash_alg'];
+        $cipher = $this->settings->get('crypter.cipher');
+        $key = $this->settings->get('crypter.key');
+        $hash_alg = $this->settings->get('crypter.hash_alg');
 
         $ivlen = openssl_cipher_iv_length($cipher);
         $iv = openssl_random_pseudo_bytes($ivlen);
@@ -52,15 +55,14 @@ class Crypter
     /**
      * Decrypt the given string
      *
-     * @param string $str String to decrypt
+     * @param string $ciphertext String to decrypt
      * @return string Decrypted string
      */
-    public static function decrypt($ciphertext)
+    public function decrypt($ciphertext)
     {
-        $settings = App::getContainer()['settings'];
-        $cipher = $settings['crypter']['cipher'];
-        $key = $settings['crypter']['key'];
-        $hash_alg = $settings['crypter']['hash_alg'];
+        $cipher = $this->settings->get('crypter.cipher');
+        $key = $this->settings->get('crypter.key');
+        $hash_alg = $this->settings->get('crypter.hash_alg');
 
         $c = base64_decode($ciphertext);
         $ivlen = openssl_cipher_iv_length($cipher);
@@ -74,7 +76,7 @@ class Crypter
         return false;
     }
 
-    public static function generateString($length)
+    public function generateString($length)
     {
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return substr(str_shuffle(str_repeat($x=$characters, ceil($length/strlen($x)) )),1,$length);

@@ -17,9 +17,9 @@ class Auth
 {
     private $session;
 
-    public function __construct($container)
+    public function __construct($session)
     {
-        $this->session = $container->session;
+        $this->session = $session;
     }
 
     public function attempt($email, $password)
