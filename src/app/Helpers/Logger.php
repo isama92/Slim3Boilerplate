@@ -10,6 +10,8 @@
 
 namespace App\Helpers;
 
+use Slim\Settings;
+use App\Auth\Auth;
 use App\Models\Log;
 use App\Models\IpCache;
 
@@ -19,7 +21,7 @@ class Logger
     private $settings;
     private $auth;
 
-    public function __construct($settings, $auth)
+    public function __construct(Settings $settings, Auth $auth)
     {
         $this->settings = $settings;
         $this->auth = $auth;

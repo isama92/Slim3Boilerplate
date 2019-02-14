@@ -10,15 +10,17 @@
 
 namespace App\Helpers;
 
+use Slim\Settings;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+
 
 class Exporter
 {
     protected $save_path;
 
-    public function __construct($settings)
+    public function __construct(Settings $settings)
     {
         $this->save_path = $settings->get('tmp_path');
     }

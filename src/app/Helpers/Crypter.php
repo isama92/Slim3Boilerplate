@@ -10,12 +10,14 @@
 
 namespace App\Helpers;
 
+use Slim\Settings;
+
 
 class Crypter
 {
     private $settings;
 
-    public function __construct($settings)
+    public function __construct(Settings $settings)
     {
         $this->settings = $settings;
     }

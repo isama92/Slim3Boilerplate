@@ -97,6 +97,11 @@ class ACLMiddleware extends Middleware
             ],
             [
                 'role' => [$this->roles['admin']],
+                'path' => '/admin/users/restore/',
+                'method' => ['GET'],
+            ],
+            [
+                'role' => [$this->roles['admin']],
                 'path' => '/admin/users/login_as/',
                 'method' => ['GET'],
             ],

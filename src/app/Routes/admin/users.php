@@ -19,5 +19,6 @@ $this->group('/users', function () {
     $this->get('/update/{id}', UsersController::class . ':form')->setName('users_update');
     $this->post('/update/{id}', UsersController::class . ':update')->setName('users_update_save');
     $this->get('/delete/{id}', UsersController::class . ':delete')->setName('users_delete');
+    $this->get('/restore/{id}', UsersController::class . ':restore')->setName('users_restore');
     $this->get('/login_as/{id}', UsersController::class . ':loginAs')->setName('users_login_as');
 });

@@ -12,12 +12,17 @@ namespace App\Validation;
 
 use Respect\Validation\Exceptions\NestedValidationException;
 use Slim\Http\Request;
-use SlimFacades\App;
 
 
 class Validator
 {
     protected $errors;
+    protected $session;
+
+    public function __construct($session)
+    {
+        $this->session = $session;
+    }
 
     /**
      * For each rule in $rules, it validates a field with the same name in $request
@@ -35,8 +40,7 @@ class Validator
                 $this->errors[$field] = $e->getMessages();
             }
         }
-        $session = App::getContainer()->session;
-        $session->set('errors', $this->errors);
+        $this->session->set('errors', $this->errors);
         return $this;
     }
 
@@ -58,8 +62,7 @@ class Validator
                     $this->errors[$f] = $e->getMessages();
                 }
             }
-        $session = App::getContainer()->session;
-        $session->set('errors', $this->errors);
+        $this->session->set('errors', $this->errors);
         return $this;
     }
 

@@ -10,7 +10,7 @@
 
 namespace App\Helpers;
 
-use SlimFacades\App;
+use Slim\Settings;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -22,7 +22,7 @@ class Mailer
     protected $test_email;
     protected $error;
 
-    public function __construct($settings)
+    public function __construct(Settings $settings)
     {
         $mail_settings = $settings['mailer'];
 

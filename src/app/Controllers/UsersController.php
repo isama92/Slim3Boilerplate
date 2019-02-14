@@ -12,12 +12,21 @@ namespace App\Controllers;
 
 use Slim\Http\Request;
 use Slim\Http\Response;
+use App\Repositories\UserRepository;
 use App\Models\User;
 use App\Models\Role;
 
 
 class UsersController extends Controller
 {
+    protected $users;
+
+    public function __construct(UserRepository $users)
+    {
+        // this is just an example, at the moment is not used (user repository)
+        $this->users = $users;
+    }
+
     public function index(Request $request, Response $response)
     {
         $where = [];
@@ -82,11 +91,11 @@ class UsersController extends Controller
         return $response->withRedirect($this->container->get('router')->pathFor('users'));
     }
 
-    public function form(Request $request, Response $response, $args)
+    public function form(Request $request, Response $response, $id = null)
     {
         $user = null;
-        if(isset($args['id'])) {
-            $user = User::find($args['id']);
+        if(isset($id)) {
+            $user = User::find($id);
             if(!$user) {
                 $this->container->get('flash')->addMessage('error', 'User do not exists');
                 return $response->withRedirect($this->container->get('router')->pathFor('users'));
@@ -105,7 +114,7 @@ class UsersController extends Controller
         if(!$validation->failed()) {
             $user = new User;
             $user->fill($POST);
-            $user->setPassword($POST['password']);
+            $user->password = $this->container->get('crypter')->hashPassword($POST['password']);
             if(isset($POST['role_id']))
                 $user->setRole($this->container->get('auth')->user()->role, $POST['role_id']);
             if($user->save()) {
@@ -118,10 +127,10 @@ class UsersController extends Controller
         return $response->withRedirect($this->container->get('router')->pathFor('users_create'));
     }
 
-    public function update(Request $request, Response $response, $args)
+    public function update(Request $request, Response $response, $id)
     {
         $POST = $request->getParsedBody();
-        $user = User::find($args['id']);
+        $user = User::find($id);
         if(!$user) {
             $this->container->get('flash')->addMessage('error', 'User do not exists');
             return $response->withRedirect($this->container->get('router')->pathFor('users'));
@@ -130,7 +139,7 @@ class UsersController extends Controller
         if(!$validation->failed()) {
             $user->fill($POST);
             if(isset($POST['password']) && $POST['password'] !== '')
-                $user->setPassword($POST['password']);
+                $user->password = $this->container->get('crypter')->hashPassword($POST['password']);
             if(isset($POST['role_id']))
                 $user->setRole($this->container->get('auth')->user()->role, $POST['role_id']);
             if($user->save()) {
@@ -140,12 +149,12 @@ class UsersController extends Controller
             }
             $this->container->get('flash')->addMessage('error', 'An error has occurred');
         }
-        return $response->withRedirect($this->container->get('router')->pathFor('users_update', ['id' => $args['id']]));
+        return $response->withRedirect($this->container->get('router')->pathFor('users_update', ['id' => $id]));
     }
 
-    public function delete(Request $request, Response $response, $args)
+    public function delete(Request $request, Response $response, $id)
     {
-        $user = User::find($args['id']);
+        $user = User::find($id);
         if($user) {
             $user->delete();
             $this->container->get('flash')->addMessage('success', 'User has been deleted successfully');
@@ -155,9 +164,21 @@ class UsersController extends Controller
         return $response->withRedirect($this->container->get('router')->pathFor('users'));
     }
 
-    public function loginAs(Request $request, Response $response, $args)
+    public function restore(Request $request, Response $response, $id)
     {
-        $user = User::find($args['id']);
+        $user = User::withTrashed()->find($id);
+        if($user) {
+            $user->restore();
+            $this->container->get('flash')->addMessage('success', 'User has been restored successfully');
+            $this->container->get('logger')->log('USER_RESTORE', $user->id);
+        } else
+            $this->container->get('flash')->addMessage('error', 'User do not exists');
+        return $response->withRedirect($this->container->get('router')->pathFor('users'));
+    }
+
+    public function loginAs(Request $request, Response $response, $id)
+    {
+        $user = User::find($id);
         if(!$user) {
             $this->container->get('flash')->addMessage('error', 'User do not exists');
             return $response->withRedirect($this->container->get('router')->pathFor('users'));

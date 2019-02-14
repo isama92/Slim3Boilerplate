@@ -53,7 +53,7 @@ class AuthController extends Controller
         $user = $this->container->get('auth')->user();
         $validation = $this->container->get('validator')->massValidate($request, User::validatorsChangePassword($request, $user));
         if(!$validation->failed()) {
-            $user->setPassword($request->getParam('password'));
+            $user->password = $this->container->get('crypter')->hashPassword($request->getParam('password'));
             if($user->save()) {
                 $this->container->get('flash')->addMessage('success', 'Your password was changed');
                 return $response->withRedirect($this->container->get('router')->pathFor('admin'));

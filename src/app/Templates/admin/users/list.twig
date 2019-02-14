@@ -74,16 +74,29 @@
                             >
                                 <i class="fa fa-pencil text-warning"></i>
                             </a>
-                            <span class="action" data-toggle="tooltip"
-                                  data-placement="top" title="Delete"
-                            >
-                                <a href="" data-toggle="modal" data-target="#modal_confirm"
-                                   data-href="{{ path_for('users_delete', {id: user.id}) }}"
-                                   data-title="Delete Confirmation" data-body="Are you sure you want to delete this user?"
-                                   data-button="Delete" data-bclass="btn-danger">
-                                    <i class="fa fa-trash text-danger"></i>
-                                </a>
-                            </span>
+                            {% if user.deleted_at == null %}
+                                <span class="action" data-toggle="tooltip"
+                                      data-placement="top" title="Delete"
+                                >
+                                    <a href="" data-toggle="modal" data-target="#modal_confirm"
+                                       data-href="{{ path_for('users_delete', {id: user.id}) }}"
+                                       data-title="Delete Confirmation" data-body="Are you sure you want to delete this user?"
+                                       data-button="Delete" data-bclass="btn-danger">
+                                        <i class="fa fa-trash text-danger"></i>
+                                    </a>
+                                </span>
+                            {% else %}
+                                <span class="action" data-toggle="tooltip"
+                                      data-placement="top" title="Restore"
+                                >
+                                    <a href="" data-toggle="modal" data-target="#modal_confirm"
+                                       data-href="{{ path_for('users_restore', {id: user.id}) }}"
+                                       data-title="Restore Confirmation" data-body="Are you sure you want to restore this user?"
+                                       data-button="Restore" data-bclass="btn-success">
+                                        <i class="fa fa-undo text-success"></i>
+                                    </a>
+                                </span>
+                            {% endif %}
                             {% if auth.user.role.name == 'admin' %}
                                 <a href="{{ path_for('users_login_as', {id: user.id}) }}"
                                    class="action" data-toggle="tooltip"

@@ -20,6 +20,7 @@
 });
 
 $container->addServiceProvider(new \App\Providers\DatabaseServiceProvider());
+$container->addServiceProvider(new \App\Providers\RepositoryServiceProvider());
 $container->addServiceProvider(new \App\Providers\ViewServiceProvider());
 $container->addServiceProvider(new \App\Providers\FlashServiceProvider());
 $container->addServiceProvider(new \App\Providers\ValidatorServiceProvider());

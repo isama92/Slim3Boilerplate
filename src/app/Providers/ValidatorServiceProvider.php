@@ -20,8 +20,9 @@ class ValidatorServiceProvider extends AbstractServiceProvider
 
     public function register()
     {
-        $this->container->share('validator', function () {
-            return new Validator;
+        $container = $this->container;
+        $container->share('validator', function () use ($container) {
+            return new Validator($container->get('session'));
         });
     }
 }
