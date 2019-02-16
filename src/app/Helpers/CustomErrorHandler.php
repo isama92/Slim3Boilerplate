@@ -24,9 +24,10 @@ class CustomErrorHandler
 
     public function render(Response $response, $code, $msg)
     {
-        return $this->view->render($response, 'error.twig', [
+        $this->view->render($response, 'error.twig', [
             'code' => $code,
             'msg' => $msg,
         ]);
+        return $response->withStatus($code);
     }
 }

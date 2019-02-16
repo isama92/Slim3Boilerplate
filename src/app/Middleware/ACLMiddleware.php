@@ -46,11 +46,6 @@ class ACLMiddleware extends Middleware
                 'method' => ['GET'],
             ],
             [
-                'role' => '*',
-                'path' => '[]',
-                'method' => ['GET'],
-            ],
-            [
                 'role' => [$this->roles['user'], $this->roles['admin']],
                 'path' => '/admin[/]',
                 'method' => ['GET'],

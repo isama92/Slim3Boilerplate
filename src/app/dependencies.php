@@ -32,6 +32,7 @@ $container->addServiceProvider(new \App\Providers\CustomErrorHandlerServiceProvi
 $container->addServiceProvider(new \App\Providers\CrypterServiceProvider());
 $container->addServiceProvider(new \App\Providers\MailerServiceProvider());
 $container->addServiceProvider(new \App\Providers\ExporterServiceProvider());
+$container->addServiceProvider(new \App\Providers\NotFoundHandlerServiceProvider());
 
 $app->add(new \App\Middleware\ValidationErrorMiddleware($container));
 $app->add(new \App\Middleware\OldInputMiddleware($container));
