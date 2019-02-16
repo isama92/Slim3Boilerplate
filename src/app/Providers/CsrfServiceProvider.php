@@ -26,9 +26,15 @@ class CsrfServiceProvider extends AbstractServiceProvider
         $container->share('csrf', function () use ($container) {
             $guard = new Guard;
             $guard->setFailureCallable(function(Request $request, Response $response, $next) use ($container) {
+                $route = $request->getAttribute('route');
+                if(!$route)
+                    return $next($request, $response);
+                $pattern =  $route->getPattern();
+                if(strpos($pattern, '/api/') !== false)
+                    return $next($request, $response);
                 return $container->get('view')->render($response, 'error.twig', [
                     'code' => 500,
-                    'msg' => 'You cannot reload the page',
+                    'msg' => 'Impossibile ricaricare la pagina',
                 ]);
             });
             return $guard;

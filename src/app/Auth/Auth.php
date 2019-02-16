@@ -42,7 +42,7 @@ class Auth
     public function user()
     {
         if($this->check())
-            return User::find($this->session->user);
+            return User::withTrashed()->find($this->session->user);
         else
             return false;
     }

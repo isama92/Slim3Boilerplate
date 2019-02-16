@@ -138,25 +138,25 @@ class ACLMiddleware extends Middleware
         $userRole = $this->roles['guest'];
 
         $route = $request->getAttribute('route');
+
+        if(!$route)
+            return $next($request, $response);
+
         $path = $route->getPattern();
         $method = $request->getMethod();
 
-        if($this->auth->check()) {
-            $user = $this->auth->user();
-            if($user)
-                $userRole = $user->role->level;
-        }
-
         $accessRule = $this->ACL($path, $method);
-        if($accessRule)
-            if($this->checkUserRole($accessRule['role'], $userRole)) {
 
-            }
-            else
-                return $this->denyAccess($response, $accessRule['path']);
-        else
+        if(!$accessRule)
+            return $this->denyAccess($response, $accessRule['path']);
+
+        if($this->auth->check())
+            $userRole = $this->auth->user()->role->level;
+
+        if(!$this->checkUserRole($accessRule['role'], $userRole))
             return $this->denyAccess($response, $accessRule['path']);
 
         return $next($request, $response);
+
     }
 }
