@@ -63,10 +63,17 @@ class User extends Model
         return password_verify($password, $this->password);
     }
 
-    public function setRole($permissionRole, $newRoleId) {
+    public function setRole($newRoleId, $permissionRole = 0) {
         $newRole = Role::find($newRoleId);
-        if($newRole && $newRole->level <= $permissionRole->level)
+        if($newRole && $newRole->level <= $permissionRole)
             $this->role()->associate($newRole);
+        else return false;
+    }
+
+    public function setLowestRole()
+    {
+        $newRole = Role::orderBy('level', 'ASC')->first();
+        $this->role()->associate($newRole);
     }
 
     public static function validatorsCreate($request, $loggedUser)

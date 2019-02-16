@@ -48,8 +48,11 @@ class UsersController extends Controller
 
         $users = User::withTrashed()->where($where)->orderBy($orderBy, $orderType)->paginate(12)->appends($request->getParams());
 
+        $filter_roles = Role::orderBy('level', 'DESC')->get();
+
         return $this->container->get('view')->render($response, 'admin/users/list.twig', [
             'users' => $users,
+            'filter_roles' => $filter_roles,
             'filters' => $filters,
             'orderBy' => $orderBy,
             'orderType' => $orderType,
@@ -60,10 +63,9 @@ class UsersController extends Controller
     public function indexJson(Request $request, Response $response)
     {
         $where = [];
-        if($this->container->get('session')->exists('users_filters')) {
+        if($this->container->get('session')->exists('users_filters'))
             foreach($this->container->get('session')->users_filters as $k => $v)
                 $where[] = [$k, 'LIKE', '%' . $v . '%'];
-        }
 
         $users = User::where($where)->orderBy('created_at', 'ASC')->paginate(12);
 
@@ -110,46 +112,73 @@ class UsersController extends Controller
     public function create(Request $request, Response $response)
     {
         $POST = $request->getParsedBody();
+        $authUserRole = 0;
+        if($this->container->get('auth')->check())
+            $authUserRole = $this->container->get('auth')->user()->role->level;
+
+        $errorRedirect = $response->withRedirect($this->container->get('router')->pathFor('users_create'));
         $validation = $this->container->get('validator')->massValidate($request, User::validatorsCreate($request, $this->container->get('auth')->user()));
-        if(!$validation->failed()) {
-            $user = new User;
-            $user->fill($POST);
-            $user->password = $this->container->get('crypter')->hashPassword($POST['password']);
-            if(isset($POST['role_id']))
-                $user->setRole($this->container->get('auth')->user()->role, $POST['role_id']);
-            if($user->save()) {
-                $this->container->get('flash')->addMessage('success', 'User created successfully');
-                $this->container->get('logger')->log('USER_CREATE', $user->id);
-                return $response->withRedirect($this->container->get('router')->pathFor('users'));
-            }
+
+        if($validation->failed())
+            return $errorRedirect;
+
+        $user = new User;
+        $user->fill($POST);
+        $user->password = $this->container->get('crypter')->hashPassword($POST['password']);
+
+        if(!isset($POST['role_id']) || !$user->setRole($POST['role_id'], $authUserRole))
+            $user->setLowestRole();
+
+        if(!$user->save()) {
             $this->container->get('flash')->addMessage('error', 'An error has occurred');
+            return $errorRedirect;
         }
-        return $response->withRedirect($this->container->get('router')->pathFor('users_create'));
+
+        $this->container->get('flash')->addMessage('success', 'User created successfully');
+        $this->container->get('logger')->log('USER_CREATE', $user->id);
+        return $response->withRedirect($this->container->get('router')->pathFor('users'));
     }
 
     public function update(Request $request, Response $response, $id)
     {
         $POST = $request->getParsedBody();
         $user = User::find($id);
+        $authUserRole = 0;
+        if($this->container->get('auth')->check())
+            $authUserRole = $this->container->get('auth')->user()->role->level;
+
+        $redirectUsers = $response->withRedirect($this->container->get('router')->pathFor('users'));
+        $errorRedirect = $response->withRedirect($this->container->get('router')->pathFor('users_update', ['id' => $id]));
+
         if(!$user) {
             $this->container->get('flash')->addMessage('error', 'User do not exists');
-            return $response->withRedirect($this->container->get('router')->pathFor('users'));
+            return $redirectUsers;
         }
+
+
+
         $validation = $this->container->get('validator')->massValidate($request, User::validatorsUpdate($request, $this->container->get('auth')->user(), $user));
-        if(!$validation->failed()) {
-            $user->fill($POST);
-            if(isset($POST['password']) && $POST['password'] !== '')
-                $user->password = $this->container->get('crypter')->hashPassword($POST['password']);
-            if(isset($POST['role_id']))
-                $user->setRole($this->container->get('auth')->user()->role, $POST['role_id']);
-            if($user->save()) {
-                $this->container->get('flash')->addMessage('success', 'User updated successfully');
-                $this->container->get('logger')->log('USER_UPDATE', $user->id);
-                return $response->withRedirect($this->container->get('router')->pathFor('users'));
-            }
+
+        if(!$validation->failed())
+            return $errorRedirect;
+
+
+        $user->fill($POST);
+
+        if(isset($POST['password']) && $POST['password'] !== '')
+            $user->password = $this->container->get('crypter')->hashPassword($POST['password']);
+
+        if(isset($POST['role_id']))
+            $user->setRole($POST['role_id'], $authUserRole);
+
+        if(!$user->save()) {
             $this->container->get('flash')->addMessage('error', 'An error has occurred');
+            return $errorRedirect;
         }
-        return $response->withRedirect($this->container->get('router')->pathFor('users_update', ['id' => $id]));
+
+        $this->container->get('flash')->addMessage('success', 'User updated successfully');
+        $this->container->get('logger')->log('USER_UPDATE', $user->id);
+        return $redirectUsers;
     }
 
     public function delete(Request $request, Response $response, $id)

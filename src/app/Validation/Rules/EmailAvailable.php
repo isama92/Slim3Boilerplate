@@ -16,7 +16,7 @@ use App\Models\User;
 
 class EmailAvailable extends AbstractRule
 {
-    protected $email;
+    protected $oldEmail;
 
     /**
      * Constructor
@@ -25,7 +25,7 @@ class EmailAvailable extends AbstractRule
      */
     public function __construct($email = null)
     {
-        $this->email = $email;
+        $this->oldEmail = $email;
     }
 
     /**
@@ -36,9 +36,8 @@ class EmailAvailable extends AbstractRule
      */
     public function validate($email)
     {
-        if($this->email === null || $this->email != $email)
-            return User::where('email', $email)->count() === 0;
-        else
+        if($this->oldEmail === $email)
             return true;
+        return User::where('email', $email)->count() === 0;
     }
 }

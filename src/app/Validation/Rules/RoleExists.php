@@ -24,7 +24,6 @@ class RoleExists extends AbstractRule
      */
     public function validate($role_id)
     {
-        $new_role = Role::find($role_id);
-        return boolval($new_role);
+        return Role::where('id', $role_id)->count() === 1;
     }
 }
