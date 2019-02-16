@@ -18,13 +18,18 @@ use PHPMailer\PHPMailer\Exception;
 class Mailer
 {
     protected $mailer;
-    protected $test_mode;
+    protected $debug_mode;
     protected $test_email;
-    protected $error;
+    protected $errors;
+    protected $recipients_ok;
+    protected $templates_ok;
 
     public function __construct(Settings $settings)
     {
         $mail_settings = $settings['mailer'];
+        $this->errors = [];
+        $this->recipients_ok = false;
+        $this->templates_ok = false;
 
         $this->error = '';
 
@@ -32,57 +37,94 @@ class Mailer
             $mailer = new PHPMailer(true);
             $mailer->setFrom($mail_settings['from']['address'], $mail_settings['from']['name']);
         } catch (Exception $e) {
-            $this->error = 'Mailer Error: ' . $this->mailer->ErrorInfo;
+            $this->errors[] = 'Mailer Error: ' . $this->mailer->ErrorInfo;
         }
 
         $this->mailer = $mailer;
-        $this->test_mode = $settings['test_mode'];
+        $this->debug_mode = $settings['debug_mode'];
         $this->test_email = $mail_settings['test_email'];
         $this->template_path = $mail_settings['template_path'];
     }
 
-    public function getError()
+    public function getErrors()
     {
-        return $this->error !== ''? $this->error : false;
+        return !empty($this->errors)? $this->errors : false;
     }
 
-    public function setRecipients($recipients, $ignoreTest = false)
+    public function addRecipients($param_recipients = null, $ignoreDebug = false)
     {
-        // $recipients: string or array of recipients where recipient format is ['name' => 'john', 'email' =>'john@doe.com']
-        if(!is_array($recipients) && is_string($recipients))
-            $recipients = [['email' => $recipients, 'name' => $recipients]];
-        if(is_array($recipients))
-            if(!$this->test_mode || $ignoreTest)
-                foreach($recipients as $recipient)
-                    $this->mailer->addAddress($recipient['email'], $recipient['name']);
-            else
-                $this->setTestRecipients();
-        else
-            $this->error = 'Recipients Error: failed to set recipients';
+        $recipients = [];
+
+        if($this->debug_mode && !$ignoreDebug)
+            $recipients = $this->getTestRecipients();
+        else {
+            if(!is_array($param_recipients) && is_string($param_recipients))
+                $recipients = [['email' => $param_recipients, 'name' => $param_recipients]];
+            elseif(is_array($param_recipients)) {
+                if(isset($param_recipients['name'], $param_recipients['email']))
+                    $recipients[] = $param_recipients;
+                else
+                    $recipients = $param_recipients;
+            }
+        }
+
+        if(!empty($recipients)) {
+            foreach($recipients as $recipient)
+                $this->mailer->addAddress($recipient['email'], $recipient['name']);
+            $this->recipients_ok = true;
+        } else
+            $this->errors[] = 'Recipients Error: failed to set recipients';
     }
 
-    private function setTestRecipients()
+    public function addCC($param_recipients = null, $ignoreDebug = false)
     {
-        $this->mailer->addAddress($this->test_email, $this->test_email);
+        $recipients = [];
+
+        if($this->debug_mode && !$ignoreDebug)
+            $recipients = $this->getTestRecipients();
+        else {
+            if(!is_array($param_recipients) && is_string($param_recipients))
+                $recipients = [['email' => $param_recipients, 'name' => $param_recipients]];
+            elseif(is_array($param_recipients)) {
+                if(isset($param_recipients['name'], $param_recipients['email']))
+                    $recipients[] = $param_recipients;
+                else
+                    $recipients = $param_recipients;
+            }
+        }
+
+        if(!empty($recipients)) {
+            foreach($recipients as $recipient)
+                $this->mailer->addCC($recipient['email'], $recipient['name']);
+            $this->recipients_ok = true;
+        } else
+            $this->errors[] = 'Recipients Error: failed to set recipients';
+    }
+
+    private function getTestRecipients()
+    {
+        return [
+            ['name' => $this->test_email, 'email' => $this->test_email],
+        ];
     }
 
     private function loadTemplate($path, $format, $vars)
     {
         // header
-        $header_path = $this->template_path . DIRECTORY_SEPARATOR . 'header' . $format;
+        $header_path = $this->template_path . DIRECTORY_SEPARATOR . 'partials' . DIRECTORY_SEPARATOR . 'header' . $format;
         $header = @file_get_contents($header_path);
         // footer
-        $footer_path = $this->template_path . DIRECTORY_SEPARATOR . 'footer' . $format;
+        $footer_path = $this->template_path . DIRECTORY_SEPARATOR . 'partials' . DIRECTORY_SEPARATOR . 'footer' . $format;
         $footer = @file_get_contents($footer_path);
         // template
         $template = @file_get_contents($path . $format);
         if(!$template) {
-            $this->error = 'Mailer error: no template selected';
+            $this->errors[] = 'Mailer error: no template selected';
             $template = '';
         }
         $template = $header . $template . $footer;
         foreach($vars as $k => $v)
-            $template = str_replace('{'.$k.'}', $v, $template);
+            $template = str_replace('{{'.$k.'}}', $v, $template);
         return $template;
     }
 
@@ -97,20 +139,25 @@ class Mailer
             $this->mailer->Subject = $subject;
             $this->mailer->Body = $bodyHtml;
             $this->mailer->AltBody = $bodyTxt;
+            $this->templates_ok = true;
         } catch (Exception $e) {
-            $this->error = 'Mailer Error: ' . $this->mailer->ErrorInfo;
+            $this->errors[] = 'Mailer Error: ' . $this->mailer->ErrorInfo;
         }
     }
 
     public function send()
     {
         try {
-            if($this->error === '')
-                if(!$this->mailer->send())
-                    $this->error = 'Mailer Error: Error while sending the email';
+            if(empty($this->errors) || !$this->recipients_ok || !$this->templates_ok)
+                if($this->mailer->send()) {
+                    $this->recipients_ok = false;
+                    $this->templates_ok = false;
+                    $this->errors = [];
+                } else
+                    $this->errors[] = 'Mailer Error: Error while sending the email';
         } catch (Exception $e) {
-            $this->error = 'Mailer Error: ' . $this->mailer->ErrorInfo;
+            $this->errors[] = 'Mailer Error: ' . $this->mailer->ErrorInfo;
         }
-        return $this->error === '';
+        return empty($this->errors);
     }
 }
