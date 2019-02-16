@@ -17,11 +17,13 @@ class Utility
         $beginningPos = strpos($str, $beginning);
         $endPos = strpos($str, $end);
 
-        if ($beginningPos === false || $endPos === false)
-            return $str;
+        while($beginningPos !== false || $endPos !== false) {
+            $textToDelete = substr($str, $beginningPos, ($endPos + strlen($end)) - $beginningPos);
+            $str = str_replace($textToDelete, '', $str);
+            $beginningPos = strpos($str, $beginning);
+            $endPos = strpos($str, $end);
+        }
 
-        $textToDelete = substr($str, $beginningPos, ($endPos + strlen($end)) - $beginningPos);
-
-        return str_replace($textToDelete, '', $str);
+        return $str;
     }
 }
